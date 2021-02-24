@@ -15,7 +15,7 @@ export class FormStepComponent{
 
   const = constantes;
 
-  constructor(private centrales: CentralesService) { 
+  constructor(public centrales: CentralesService) { 
     this.centrales.contacto.DatosBasicos.TipoDocumento = 1;
    }
 
