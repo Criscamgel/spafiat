@@ -1,12 +1,40 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { ScanparamsService } from './scan-params.service';
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class CentralesService {
+
+  contacto:ContactoInterface = {
+    DatosBasicos: {
+      TipoDocumento: null,  
+      NumeroDocumento: null,  
+      Nombre1: null,  
+      Celular: null,  
+      CorreoPersonal: null
+    },
+  
+    DatosFinancieros: {  
+      ActividadEconomica: null,  
+      ActividadIndependiente: 3,  
+      IngresoMensual: null  
+    },
+  
+    OtrosDatos: {  
+      AutorizaConsultaCentrales: false,  
+      AutorizaMareigua: false,  
+      ValorFinanciar: null,
+      IdentificacionVendedor: null  
+    },
+
+    DatosVehiculo: {
+      Marca: 5
+    }
+  }
 
   token:any;
   env = environment;
@@ -21,13 +49,16 @@ export class CentralesService {
   options = { headers: this.headers }
 
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, public scanParams: ScanparamsService) { }
 
   authenticate(contacto){
 
+    this.contacto.OtrosDatos.ConcesionarioRadicacion = this.scanParams.idc;
+    this.contacto.OtrosDatos.IdentificacionVendedor = this.scanParams.idv;
+    this.contacto.OtrosDatos.InfoUno = this.scanParams.utm;
+
     const bodyT = {
-      Username: this.env.username,
-      Password: this.env.password
+      UserPass: this.env.userpass
     }
 
     const body = new HttpParams({fromObject:bodyT}) 
@@ -51,4 +82,43 @@ export class CentralesService {
       return this.http.post(`${this.env.urlVp}`, contacto, this.optionsVi)         
   }
 
+}
+
+export interface DatosBasicos {
+  
+  Nombre1?: String; 
+  TipoDocumento?: number;  
+  NumeroDocumento?: String;  
+  Celular?: String;  
+  CorreoPersonal?: String;
+}
+
+export interface DatosFinancieros {
+  
+  ActividadEconomica?: Number;  
+  ActividadIndependiente?: Number;  
+  IngresoMensual?: Number;
+  
+}
+
+export interface OtrosDatos {
+  
+  AutorizaConsultaCentrales?: Boolean;  
+  AutorizaMareigua?: Boolean;  
+  ValorFinanciar?: Number;
+  ConcesionarioRadicacion?: any;
+  IdentificacionVendedor?: any;
+  InfoUno?: any;
+}
+
+export interface DatosVehiculo {
+  Marca: number;
+}
+
+export interface ContactoInterface{
+
+  DatosBasicos?:DatosBasicos;
+  DatosFinancieros?:DatosFinancieros;
+  OtrosDatos?:OtrosDatos;
+  DatosVehiculo:DatosVehiculo;
 }
